@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import FormComponent from "@/components/FormComponent.vue";
 import TableComponent from "@/components/TableComponent.vue";
+import EmptyComponent from "@/components/EmptyComponent.vue";
 import useShops from "@/composables/useShops";
 
 const { createShop, getAllShops } = useShops();
@@ -26,6 +27,18 @@ const columns = [
   { name: "number", label: "Телефон" },
 ];
 
+const isFormValid = ref(false);
+
+// Валидируем форму
+watch(inputs, () => {
+  // следим за полями формы и селектом
+  inputs.forEach((input) => {
+    input.isValid = !!input.value.length;
+  });
+  // если поля пусты или селект не выбран запрещаем отправку формы
+  isFormValid.value = inputs.every((input) => input.isValid);
+});
+
 //Функция вызывается при событии on-save
 const onSave = async () => {
   // Формируем объект со значениями
@@ -39,8 +52,13 @@ const onSave = async () => {
   shops.value = await getAllShops();
 
   // сбрасываем поля в форме
-  inputs[0].value = "";
-  inputs[1].value = "";
+  onCleanInputs();
+};
+// Чистим все инпуты
+const onCleanInputs = () => {
+  inputs.forEach((input) => {
+    input.value = "";
+  });
 };
 
 onMounted(async () => {
@@ -54,7 +72,12 @@ onMounted(async () => {
   <br />
   <br />
   <br />
-  <FormComponent title="Добавить магазин" :on-save="onSave">
+  <FormComponent
+    title="Добавить магазин"
+    :clean-inputs="onCleanInputs"
+    :on-save="onSave"
+    :isFormValid="isFormValid"
+  >
     <input
       v-for="input in inputs"
       :key="input.name"
@@ -66,5 +89,6 @@ onMounted(async () => {
     />
   </FormComponent>
   <br />
-  <TableComponent :columns="columns" :data="shops" />
+  <TableComponent v-if="shops.length" :columns="columns" :data="shops" />
+  <EmptyComponent v-if="!shops.length" />
 </template>

@@ -4,6 +4,8 @@ import { ref } from "vue";
 const props = defineProps({
   title: { type: String, require: true },
   onSave: { type: Function, require: true },
+  cleanInputs: { type: Function, require: true },
+  isFormValid: { type: Boolean, require: true },
 });
 
 const open = ref(false);
@@ -15,6 +17,7 @@ function onSave() {
 }
 
 function onClose() {
+  props.cleanInputs();
   open.value = false;
 }
 </script>
@@ -33,7 +36,12 @@ function onClose() {
         <form @submit.prevent="onSave">
           <slot />
           <div class="modal-footer">
-            <button type="submit" class="btn save">Сохранить</button>
+            <div class="error-message" :class="!isFormValid ? 'visible' : ''">
+              Заполните все поля
+            </div>
+            <button :disabled="!isFormValid" type="submit" class="btn save">
+              Сохранить
+            </button>
           </div>
         </form>
         <button type="button" class="close" @click="onClose">x</button>
@@ -116,6 +124,10 @@ function onClose() {
 .save {
   width: 100%;
 }
+.save:disabled {
+  background: #b7b7b7;
+  cursor: not-allowed;
+}
 
 .input {
   width: 100%;
@@ -135,7 +147,6 @@ function onClose() {
   width: 100%;
   padding: 8px;
   margin-top: 10px;
-  margin-bottom: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
   appearance: none; /* Убрать стандартный вид select */
@@ -159,12 +170,16 @@ function onClose() {
   color: #fff;
 }
 
-.invalid {
+.error-message {
+  margin-block: 10px;
+  text-align: center;
   color: red;
-  font-size: 12px;
-  margin-top: 5px;
+  font-size: 14px;
+  opacity: 0;
 }
-
+.error-message.visible {
+  opacity: 1;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s linear;

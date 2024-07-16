@@ -6,13 +6,22 @@ export default function useCars() {
   // Создаем новый авто
   async function createCar(obj) {
     // делаем post запрос на эндпоинт
-    return await axios.post(`${import.meta.env.VITE_API_URL}/car`, obj);
+    try {
+      return await axios.post(`${import.meta.env.VITE_API_URL}/car`, obj);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
   // Получаем все машины
   async function getAllCars() {
     // делаем get запрос на эндпоинт
-    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/car`);
-    return data;
+    try {
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/car`);
+      return data;
+    } catch (error) {
+      console.log(error.message);
+      return [];
+    }
   }
 
   return { createCar, getAllCars };

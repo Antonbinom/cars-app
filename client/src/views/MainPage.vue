@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import useCars from "@/composables/useCars.js";
 
 import TableComponent from "@/components/TableComponent.vue";
+import EmptyComponent from "@/components/EmptyComponent.vue";
 
 const { getAllCars } = useCars();
 
@@ -26,7 +27,8 @@ onMounted(async () => {
   <h1>Таблица с данными об автомобилях</h1>
   <br />
   <br />
-  <TableComponent :columns="columns" :data="data" />
+  <TableComponent v-if="data.length" :columns="columns" :data="data" />
+  <EmptyComponent v-if="!data.length" />
 </template>
 
 <style scoped>

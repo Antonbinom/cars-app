@@ -1,7 +1,5 @@
 <script setup>
-import EmptyComponent from "@/components/EmptyComponent.vue";
-
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
 const props = defineProps({
   columns: Array,
   data: Array,
@@ -59,8 +57,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <EmptyComponent v-if="!data.length" />
-
   <div class="table-wrapper">
     <table ref="table" class="table">
       <thead>
